@@ -122,6 +122,12 @@ class Config{
  * @author Jared Lang
  **/
 abstract class Field{
+	protected function check_for_default(){
+		if ($this->value === null){
+			$this->value = $this->default;
+		}
+	}
+	
 	function __construct($attr){
 		$this->name        = @$attr['name'];
 		$this->id          = @$attr['id'];
@@ -129,9 +135,37 @@ abstract class Field{
 		$this->description = @$attr['description'];
 		$this->default     = @$attr['default'];
 		
-		if ($this->value === null){
-			$this->value = $this->default;
-		}
+		$this->check_for_default();
+	}
+	
+	function label_html(){
+		ob_start();
+		?>
+		<label class="block" for="<?=htmlentities($this->id)?>"><?=__($this->name)?></label>
+		<?php
+		return ob_get_clean();
+	}
+	
+	function input_html(){
+		return "Abstract Input Field, Override in Descendants";
+	}
+	
+	function description_html(){
+		ob_start();
+		?>
+		<?php if($this->description):?>
+		<p class="description"><?=__($this->description)?></p>
+		<?php endif;?>
+		<?php
+		return ob_get_clean();
+	}
+	
+	function html(){
+		$label       = $this->label_html();
+		$input       = $this->input_html();
+		$description = $this->description_html();
+		
+		return $label.$input.$description;
 	}
 }
 
@@ -158,17 +192,27 @@ abstract class ChoicesField extends Field{
  * @author Jared Lang
  **/
 class TextField extends Field{
-	function html(){
+	protected $type_attr = 'text';
+	
+	function input_html(){
 		ob_start();
 		?>
-		<label class="block" for="<?=htmlentities($this->id)?>"><?=__($this->name)?></label>
-		<input type="text" id="<?=htmlentities($this->id)?>" name="<?=htmlentities($this->id)?>" value="<?=htmlentities($this->value)?>" />
-		<?php if($this->description):?>
-		<p class="description"><?=__($this->description)?></p>
-		<?php endif;?>
+		<input type="<?=$this->type_attr?>" id="<?=htmlentities($this->id)?>" name="<?=htmlentities($this->id)?>" value="<?=htmlentities($this->value)?>" />
 		<?php
 		return ob_get_clean();
 	}
+}
+
+
+/**
+ * PasswordField can be used to accept sensitive information, not encrypted on
+ * wordpress' end however.
+ *
+ * @package default
+ * @author Jared Lang
+ **/
+class PasswordField extends TextField{
+	protected $type_attr = 'password';
 }
 
 
@@ -179,14 +223,10 @@ class TextField extends Field{
  * @author Jared Lang
  **/
 class TextareaField extends Field{
-	function html(){
+	function input_html(){
 		ob_start();
 		?>
-		<label class="block" for="<?=htmlentities($this->id)?>"><?=__($this->name)?></label>
 		<textarea id="<?=htmlentities($this->id)?>" name="<?=htmlentities($this->id)?>"><?=htmlentities($this->value)?></textarea>
-		<?php if($this->description):?>
-		<p class="description"><?=__($this->description)?></p>
-		<?php endif;?>
 		<?php
 		return ob_get_clean();
 	}
@@ -200,18 +240,14 @@ class TextareaField extends Field{
  * @author Jared Lang
  **/
 class SelectField extends ChoicesField{
-	function html(){
+	function input_html(){
 		ob_start();
 		?>
-		<label class="block" for="<?=$this->id?>"><?=__($this->name)?></label>
 		<select name="<?=htmlentities($this->id)?>" id="<?=htmlentities($this->id)?>">
 			<?php foreach($this->choices as $key=>$value):?>
 			<option<?php if($this->value == $value):?> selected="selected"<?php endif;?> value="<?=htmlentities($value)?>"><?=htmlentities($key)?></option>
 			<?php endforeach;?>
 		</select>
-		<?php if($this->description):?>
-		<p class="description"><?=__($this->description)?></p>
-		<?php endif;?>
 		<?php
 		return ob_get_clean();
 	}
@@ -225,10 +261,9 @@ class SelectField extends ChoicesField{
  * @author Jared Lang
  **/
 class RadioField extends ChoicesField{
-	function html(){
+	function input_html(){
 		ob_start();
 		?>
-		<label class="block"><?=__($this->name)?></label>
 		<ul class="radio-list">
 			<?php $i = 0; foreach($this->choices as $key=>$value): $id = htmlentities($this->id).'_'.$i++;?>
 			<li>
@@ -237,9 +272,6 @@ class RadioField extends ChoicesField{
 			</li>
 			<?php endforeach;?>
 		</ul>
-		<?php if($this->description):?>
-		<p class="description"><?=__($this->description)?></p>
-		<?php endif;?>
 		<?php
 		return ob_get_clean();
 	}
@@ -253,10 +285,9 @@ class RadioField extends ChoicesField{
  * @author Jared Lang
  **/
 class CheckboxField extends ChoicesField{
-	function html(){
+	function input_html(){
 		ob_start();
 		?>
-		<label class="block"><?=__($this->name)?></label>
 		<ul class="checkbox-list">
 			<?php $i = 0; foreach($this->choices as $key=>$value): $id = htmlentities($this->id).'_'.$i++;?>
 			<li>
@@ -265,9 +296,6 @@ class CheckboxField extends ChoicesField{
 			</li>
 			<?php endforeach;?>
 		</ul>
-		<?php if($this->description):?>
-		<p class="description"><?=__($this->description)?></p>
-		<?php endif;?>
 		<?php
 		return ob_get_clean();
 	}
@@ -331,7 +359,7 @@ class Timer{
 /**
  * Strings passed to this function will be modified under the assumption that
  * they were outputted by wordpress' the_output filter.  It checks for a handful
- * of things like empty p tags, unnecessary and unclosed tags.
+ * of things like empty, unnecessary, and unclosed tags.
  *
  * @return string
  * @author Jared Lang
@@ -583,12 +611,19 @@ function admin_help(){
 	switch($post->post_title){
 		default:
 			?>
-			<h2>Available shortcodes:</h2>
-			<ul>
+			<ul class="shortcode-list">
 				<?php foreach($shortcodes as $sc):?>
-				<li>
-					<h3><?=$sc['shortcode']?></h3>
-					<p><?=nl2br(str_replace(' *', '', htmlentities($sc['documentation'])))?></p>
+				<li class="shortcode">
+					<div class="name"><?=$sc['shortcode']?></div>
+					<div class="documentation">
+						<?=nl2br(trim(
+							str_replace(
+								array(' *'),
+								array(''),
+								htmlentities($sc['documentation'])
+							)
+						))?>
+					</div>
 				</li>
 				<?php endforeach;?>
 			</ul>
@@ -607,7 +642,7 @@ function admin_help(){
  **/
 function admin_meta_boxes(){
 	global $post;
-	add_meta_box('page-help', 'Help', 'admin_help', 'page', 'normal', 'high');
+	add_meta_box('page-help', 'Shortcode Help', 'admin_help', 'page', 'normal', 'high');
 }
 add_action('admin_init', 'admin_meta_boxes');
 
@@ -1081,7 +1116,7 @@ function opengraph_setup(){
 	);
 	
 	# Include image if available
-	if (has_post_thumbnail($post->ID)){
+	if (!is_front_page() and has_post_thumbnail($post->ID)){
 		$image = wp_get_attachment_image_src(
 			get_post_thumbnail_id( $post->ID ),
 			'single-post-thumbnail'
