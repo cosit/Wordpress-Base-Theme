@@ -1486,30 +1486,30 @@ function issuu_api_call($params) {
 			$json = file_get_contents(ISSUU_API_URL.'?'.http_build_query($params));
 
 			if($json === False) {
-				$cache_data = array('success' => False, 'message' => 'API request failed.');
-			} else {
-			
-				$obj  = json_decode($json);
-				if(is_null($obj)) {
-					$cache_data = array('success' => False, 'message' => 'Unable to decode JSON.');
-				} else if(!isset($obj->rsp) || !isset($obj->rsp->stat)) {
-					$cache_data = array('success' => False, 'message' => 'Malformed API response.');	
-				} else {
-					
-					$response = $obj->rsp;
-
-					$stat = $response->stat;
-					if($stat == 'fail') {
-						$message = 'Unknown failure.';
-						if(isset($response->_content->error->message)) {
-							$message = $response->_content->error->message;
-						}
-						$cache_data = array('success' => False, 'message' => $message);
-					} else {
-						$cache_data = array('success' => True, 'results' => $response->_content->result->_content);
-					}
-				}
+				return array('success' => False, 'message' => 'API request failed.');
 			}
+			
+			$obj  = json_decode($json);
+			if(is_null($obj)) {
+				return array('success' => False, 'message' => 'Unable to decode JSON.');
+			} 
+
+			if(!isset($obj->rsp) || !isset($obj->rsp->stat)) {
+				return array('success' => False, 'message' => 'Malformed API response.');	
+			} 
+				
+			$response = $obj->rsp;
+
+			$stat = $response->stat;
+			if($stat == 'fail') {
+				$message = 'Unknown failure.';
+				if(isset($response->_content->error->message)) {
+					$message = $response->_content->error->message;
+				}
+				return array('success' => False, 'message' => $message);
+			}
+
+			$cache_data = array('success' => True, 'results' => $response->_content->result->_content);
 			set_transient($cache_key, $cache_data, ISSUU_API_CACHE_DURATION);
 			return $cache_data;
 		}

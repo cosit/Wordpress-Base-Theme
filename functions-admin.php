@@ -128,6 +128,12 @@ function theme_options_sanitize($input){
 	return $input;
 }
 
+/**
+ * Construct and output issuu preview page
+ *
+ * @return void
+ * @author Chris Conover
+ **/
 function issuu_preview_page() {
 	
 	$api_key    = Config::$theme_settings['Issuu'][0]->value;
@@ -136,6 +142,9 @@ function issuu_preview_page() {
 	?>
 		<h2><?=__(ISSUU_PREVIEW_PAGE_TITLE)?></h2>
 		<div class="wrap" id="issuu-preview">
+			<div id="popup">
+				<a class="close"></a>
+			</div>
 	<?
 	
 	if($api_secret == '' || $api_key == '') {
@@ -175,13 +184,6 @@ function issuu_preview_page() {
 			<?
 			$count = 0;
 			foreach($documents_result['results'] as $document_wrap) {
-				#print_r($folder_wrap->folder->folderId);
-				#print_r($document_wrap->document->folders);
-
-				//if(isset($document_wrap->document->folders) &&
-				//	in_array($folder_wrap->folder->folderId, $document_wrap->document->folders)) {
-				//	
-				//}
 				$css = '';
 				if($count == 0 || ($count % 4) == 0) {
 					$css = ' class="first" ';
@@ -191,13 +193,24 @@ function issuu_preview_page() {
 				}
 				?>
 				<li<?=$css?>>
-					
 					<div class="thumb">
 						<img src="<?=sprintf($image_location, $document_wrap->document->documentId)?>" />
 					</div>
 					<div class="title"><?=$document_wrap->document->title?></div>
 					<div class="details">
-						<a>Preview</a> - <a>Embed Code</a>
+						<a class="prev" data-document-id="<?=$document_wrap->document->documentId?>">
+							Preview
+						</a>
+						<a>Embed Code</a>
+						<a class="more_details_toggle">More Details &#9660;</a>
+						<div class="more_details">
+							<h4>Description:</h4>
+							<p><?=$document_wrap->document->description?></p>
+							<h4>Tags:</h4>
+							<p><?=implode(', ',$document_wrap->document->tags)?></p>
+							<h4>Publish Date:</h4>
+							<p><?=$document_wrap->document->publishDate?></p>
+						</div>
 					</div>
 				</li>
 				<?
@@ -206,6 +219,5 @@ function issuu_preview_page() {
 			?></ul><?
 		}
 	}
-
 	print '</div>';
 }

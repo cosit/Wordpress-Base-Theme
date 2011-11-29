@@ -28,12 +28,20 @@ tr.section h3{padding: 10px; margin: 0; background-color: #efefef; color: #21759
 tr.section table{padding: 0; margin: 0 0 20px 0;}
 
 #issuu-preview {}
-#issuu-preview .folder {}
+#issuu-preview #popup {display:none;position:fixed;width:700px;height:500px;border:1px solid #000;background-color:#e9e9e9;border-radius:2px;margin-left:100px;margin-top:20%;}
+#issuu-preview #popup #template {display:none;}
+#issuu-preview #popup a.close {display:block;width:28px;height:34px;position:absolute;right:5px;top:5px;background-image:url('../img/close.png');}
+#issuu-preview #popup a.close:hover {cursor:pointer;}
 #issuu-preview #documents {}
-#issuu-preview #documents > li {float:left;width:220px;background-color:#f3f3f3;margin:5px;border-radius:3px;}
+#issuu-preview #documents > li {float:left;width:220px;background-color:#f1f1f1;margin:5px;border-radius:3px;}
 #issuu-preview #documents > li.first {margin-left:0;clear:left;}
 #issuu-preview #documents > li.last {margin-right:0;}
-#issuu-preview #documents > li .title {font-size:140%;line-height:1.3em;padding:10px 5px 0 5px;text-align:center;}
 #issuu-preview #documents > li .thumb {text-align:center;padding-top:10px;}
 #issuu-preview #documents > li .thumb > img {width:200px;}
+#issuu-preview #documents > li .title {font-size:140%;line-height:1.3em;padding:10px 5px 0 5px;text-align:center;}
 #issuu-preview #documents > li .details {text-align:center;margin:5px 5px 10px 5px;background-color:#f1f1f1;}
+#issuu-preview #documents > li .details a {display:block;font-size:120%;background-color:#FFC907;padding:5px;margin:5px 0;color:#000;border-radius:3px;}
+#issuu-preview #documents > li .details a:hover {cursor:pointer;}
+#issuu-preview #documents > li .more_details {text-align:left;margin:0 5px;}
+#issuu-preview #documents > li .more_details h4 {margin:0;}
+#issuu-preview #documents > li .more_details p {margin:0 5px;padding:3px;}
