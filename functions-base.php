@@ -1446,4 +1446,145 @@ function _show_meta_boxes($post, $meta_box){
 	<?php
 }
 
+/**
+ * Calculate an Issuu API signature
+ *
+ * @return string
+ * @author Chris Conover
+ **/
+function issuu_calc_signature($params, $api_secret) {
+	ksort($params);
+	$digest = '';
+	foreach($params as $key=>$val) {
+		$digest .= (string)$key.(string)$val;
+	}
+	
+	return md5($api_secret.$digest);
+}
+
+/**
+ * Wrapped file_get_contents and json decode for Issuu calls
+ *
+ * @return array
+ * @author Chris Conover
+ **/
+function issuu_api_call($params) {
+	
+	$cache_key_prefix = 'issuu-';
+
+	if(!isset($params['signature'])) {
+		return array('success'=>False, 'message'=>'Request signature required');
+	} else {
+		
+		$cache_key  = $cache_key_prefix.$params['signature'];
+		$cache_data = null;
+		 
+		if( ($cache_data = get_transient($cache_key)) !== False) {
+			return $cache_data;
+		} else {
+
+			$json = file_get_contents(ISSUU_API_URL.'?'.http_build_query($params));
+
+			if($json === False) {
+				$cache_data = array('success' => False, 'message' => 'API request failed.');
+			} else {
+			
+				$obj  = json_decode($json);
+				if(is_null($obj)) {
+					$cache_data = array('success' => False, 'message' => 'Unable to decode JSON.');
+				} else if(!isset($obj->rsp) || !isset($obj->rsp->stat)) {
+					$cache_data = array('success' => False, 'message' => 'Malformed API response.');	
+				} else {
+					
+					$response = $obj->rsp;
+
+					$stat = $response->stat;
+					if($stat == 'fail') {
+						$message = 'Unknown failure.';
+						if(isset($response->_content->error->message)) {
+							$message = $response->_content->error->message;
+						}
+						$cache_data = array('success' => False, 'message' => $message);
+					} else {
+						$cache_data = array('success' => True, 'results' => $response->_content->result->_content);
+					}
+				}
+			}
+			set_transient($cache_key, $cache_data, ISSUU_API_CACHE_DURATION);
+			return $cache_data;
+		}
+	}
+}
+
+
+/**
+ * Get a list of Issue document folders
+ *
+ * @return array
+ * @author Chris Conover
+ **/
+function issuu_get_folders($api_key, $api_secret) {
+
+	$params = array(
+		'apiKey'       => $api_key,
+		'resultOrder'  => 'asc',
+		'folderSortBy' => 'name',
+		'format'       => 'json',
+		'action'       => 'issuu.folders.list'
+		);
+	$signature = issuu_calc_signature($params, $api_secret);
+
+	$params['signature'] = $signature;
+
+	return issuu_api_call($params);
+}
+
+/**
+ * Get a list of Issue documents
+ *
+ * @return array
+ * @author Chris Conover
+ **/
+function issuu_get_documents($api_key, $api_secret) {
+	
+	$documents = array();
+
+	$params = array(
+		'apiKey'       => $api_key,
+		'pageSize'     => 30,
+		'startIndex'   => 0,
+		'format'       => 'json',
+		'action'       => 'issuu.documents.list'
+		);
+	$signature = issuu_calc_signature($params, $api_secret);
+	$params['signature'] = $signature;
+
+	$response = issuu_api_call($params);
+
+	if($response['success'] !== True) {
+		return $response;
+	} else {
+		if(count($response['results']) < 30) {
+			return $response;
+		} else {
+			$documents = $response['results'];
+			while(true) {
+				$params['startIndex'] += 30;
+				unset($params['signature']);
+				$signature            = issuu_calc_signature($params, $api_secret);
+				$params['signature']  = $signature;
+				$response             = issuu_api_call($params);
+
+				if($response['success'] !== True) {
+					return $response;
+				} else {
+					$documents = $documents + $response['results'];
+					if(count($response['results']) < 30) {
+						return array('success'=>True, 'results'=>$documents);
+					}
+				}
+			}
+		}
+	}
+}
 ?>

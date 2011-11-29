@@ -26,3 +26,14 @@ tr.section td{padding: 0;}
 tr.section td td{padding: 10px; margin: 0;}
 tr.section h3{padding: 10px; margin: 0; background-color: #efefef; color: #21759B; border: 1px solid #DFDFDF;}
 tr.section table{padding: 0; margin: 0 0 20px 0;}
+
+#issuu-preview {}
+#issuu-preview .folder {}
+#issuu-preview #documents {}
+#issuu-preview #documents > li {float:left;width:220px;background-color:#f3f3f3;margin:5px;border-radius:3px;}
+#issuu-preview #documents > li.first {margin-left:0;clear:left;}
+#issuu-preview #documents > li.last {margin-right:0;}
+#issuu-preview #documents > li .title {font-size:140%;line-height:1.3em;padding:10px 5px 0 5px;text-align:center;}
+#issuu-preview #documents > li .thumb {text-align:center;padding-top:10px;}
+#issuu-preview #documents > li .thumb > img {width:200px;}
+#issuu-preview #documents > li .details {text-align:center;margin:5px 5px 10px 5px;background-color:#f1f1f1;}

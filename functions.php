@@ -15,9 +15,16 @@ define('THEME_OPTIONS_NAME', 'theme');
 define('THEME_OPTIONS_PAGE_TITLE', 'Theme Options');
 
 $theme_options = get_option(THEME_OPTIONS_NAME);
+
 define('GA_ACCOUNT', $theme_options['ga_account']);
 define('CB_UID', $theme_options['cb_uid']);
 define('CB_DOMAIN', $theme_options['cb_domain']);
+
+define('ISSUU_PREVIEW_GROUP', 'settings');
+define('ISSUU_PREVIEW_NAME', 'issuu');
+define('ISSUU_PREVIEW_PAGE_TITLE', 'Issuu Preview');
+define('ISSUU_API_URL', 'http://api.issuu.com/1_0');
+define('ISSUU_API_CACHE_DURATION', 60 * 10);
 
 require_once('functions-base.php');     # Base theme functions
 require_once('custom-post-types.php');  # Where per theme post types are defined
@@ -132,6 +139,22 @@ Config::$theme_settings = array(
 			'description' => 'Number of search results to show per page of results',
 			'default'     => 10,
 			'value'       => $theme_options['search_per_page'],
+		)),
+	),
+	'Issuu' => array(
+		new TextField(array(
+			'name'        => 'API Key',
+			'id'          => THEME_OPTIONS_NAME.'[issuu_api_key]',
+			'description' => 'Found at Issuu website -> settings -> services.',
+			'default'     => null,
+			'value'       => $theme_options['issuu_api_key']
+		)),
+		new TextField(array(
+			'name'        => 'API Secret',
+			'id'          => THEME_OPTIONS_NAME.'[issuu_api_secret]',
+			'description' => 'Found at Issuu website -> settings -> services.',
+			'default'     => null,
+			'value'       => $theme_options['issuu_api_secret']
 		)),
 	),
 );
