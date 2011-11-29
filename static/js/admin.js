@@ -22,7 +22,7 @@ var __init__ = function($){
 			issuu_embed_html += '			style="width:700px;height:500px" flashvars="mode=magazine&amp;backgroundColor=%23222222&amp;documentId=<DOCUMENT_ID>" />';
 		
 
-		$('#issuu-preview #documents li')
+		$('#issuu #documents li')
 			.each(function(index, li) {
 				var more_details        = $(li).find('.more_details'),
 					more_details_toggle = $(li).find('.more_details_toggle'),
@@ -37,7 +37,7 @@ var __init__ = function($){
 				preview
 					.click(function() {
 						var document_id = $(this).attr('data-document-id'),
-							pop_div     = $('#issuu-preview #popup');
+							pop_div     = $('#issuu #preview-popup');
 						
 						var object_html = issuu_embed_html.replace('<DOCUMENT_ID>', document_id);
 						pop_div.append(object_html);
@@ -45,10 +45,10 @@ var __init__ = function($){
 						//console.log(object_html);
 					})
 			});
-		$('#issuu-preview #popup a.close')
+		$('#issuu #preview-popup a.close')
 			.click(function() {
-				$('#issuu-preview #popup').hide();
-				$('#issuu-preview #popup > embed').remove();
+				$('#issuu #preview-popup').hide();
+				$('#issuu #preview-popup > embed').remove();
 				
 			});
 	})();

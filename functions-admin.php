@@ -141,8 +141,8 @@ function issuu_preview_page() {
 
 	?>
 		<h2><?=__(ISSUU_PREVIEW_PAGE_TITLE)?></h2>
-		<div class="wrap" id="issuu-preview">
-			<div id="popup">
+		<div class="wrap" id="issuu">
+			<div id="preview-popup">
 				<a class="close"></a>
 			</div>
 	<?
