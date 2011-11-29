@@ -22,7 +22,7 @@ define('CB_DOMAIN', $theme_options['cb_domain']);
 
 define('ISSUU_PAGE_GROUP', 'settings');
 define('ISSUU_PAGE_NAME', 'issuu');
-define('ISSUU_PAGE_TITLE', 'Issuu');
+define('ISSUU_PAGE_TITLE', 'Issuu Pubs');
 define('ISSUU_API_URL', 'http://api.issuu.com/1_0');
 define('ISSUU_API_CACHE_DURATION', 60 * 10);
 
