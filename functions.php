@@ -20,9 +20,9 @@ define('GA_ACCOUNT', $theme_options['ga_account']);
 define('CB_UID', $theme_options['cb_uid']);
 define('CB_DOMAIN', $theme_options['cb_domain']);
 
-define('ISSUU_PREVIEW_GROUP', 'settings');
-define('ISSUU_PREVIEW_NAME', 'issuu');
-define('ISSUU_PREVIEW_PAGE_TITLE', 'Issuu Preview');
+define('ISSUU_PAGE_GROUP', 'settings');
+define('ISSUU_PAGE_NAME', 'issuu');
+define('ISSUU_PAGE_TITLE', 'Issuu');
 define('ISSUU_API_URL', 'http://api.issuu.com/1_0');
 define('ISSUU_API_CACHE_DURATION', 60 * 10);
 

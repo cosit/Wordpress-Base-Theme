@@ -55,8 +55,8 @@ function create_theme_options_page() {
 
 function create_issuu_preview_page() {
 	add_utility_page(
-		__(ISSUU_PREVIEW_PAGE_TITLE),
-		__(ISSUU_PREVIEW_PAGE_TITLE),
+		__(ISSUU_PAGE_TITLE),
+		__(ISSUU_PAGE_TITLE),
 		'',
 		'issue-preview',
 		'issuu_preview_page',
@@ -140,7 +140,7 @@ function issuu_preview_page() {
 	$api_secret = Config::$theme_settings['Issuu'][1]->value;
 
 	?>
-		<h2><?=__(ISSUU_PREVIEW_PAGE_TITLE)?></h2>
+		<h2><?=__(ISSUU_PAGE_TITLE)?></h2>
 		<div class="wrap" id="issuu">
 			<div id="preview-popup">
 				<a class="close"></a>
